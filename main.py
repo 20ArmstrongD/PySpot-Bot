@@ -1,33 +1,19 @@
-import pycord
 import discord
 from discord.ext import commands
+from pop import DISCORD_TOKEN, GUILD_ID
 from dotenv import load_dotenv
-import asyncio
 import psutil
-import vcgencmd
 import os
 import subprocess
 
-load_dotenv(dotenv_path='/enviornmental/.env')
-
-TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD_ID = os.getenv('GUILD_ID')
-
-print("DISCORD_TOKEN:", TOKEN)  # Should not be None
-print("GUILD_ID:", GUILD_ID)    # Should not be None
-
-if GUILD_ID is None:
-    raise ValueError("GUILD_ID is not set in the .env file.")
-
-GUILD_ID = int(GUILD_ID)  # Convert after checking 
+# Load environment variables
+load_dotenv(dotenv_path='/env/.env')
 
 intents = discord.Intents.default()
-
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 def get_system_stats():
-    
     cpu_usage = psutil.cpu_percent(interval=1)
     memory = psutil.virtual_memory()
     memory_usage = memory.percent
@@ -41,6 +27,7 @@ def get_system_stats():
         temperature = "N/A"
         
     system_stats = (
+        f"DiscordPI\n"
         f"**CPU Usage**: {cpu_usage}%\n"
         f"**Memory Usage**: {memory_usage}%\n"
         f"**Disk Usage**: {disk_usage}%\n"
@@ -49,23 +36,25 @@ def get_system_stats():
     
     return system_stats
 
-@bot.tree.command(name="PySpy", guild=discord.Object(id=GUILD_ID), description="see what the system stats of the raspberry pi running these bots")
+@bot.tree.command(name="pyspy", guild=discord.Object(id=GUILD_ID), description="See what the system stats of the Raspberry Pi running these bots are.")
 async def pyspy(interaction: discord.Interaction):
     system_stats = get_system_stats()
     await interaction.response.send_message(system_stats)
 
-
 @bot.event
 async def on_ready():
-    print(f'bot is online and logged in as {bot.user}')
-
-    
+    print(f'Bot is online and logged in as {bot.user}')
+    try:
+        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))  #Register the slash commands
+        print("/pyspy slash command registerd")
+    except:
+        print("unable to register /pyspy slash command")
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
-    if message.content.lower() == '/PySpy' or 'pyspy':
+    if message.content.lower() == '/pyspy' or message.content.lower() == 'pyspy':  # Ensure both '/pyspy' and 'pyspy' are checked
         system_stats = get_system_stats()
-        await message.channel.send(system_stats)    
-        
-bot.run(TOKEN)
+        await message.channel.send(system_stats)
+
+bot.run(DISCORD_TOKEN)
