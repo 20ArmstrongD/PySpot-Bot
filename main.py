@@ -1,13 +1,21 @@
 import discord
 from discord.ext import commands
-from pop import DISCORD_TOKEN, GUILD_ID
 from dotenv import load_dotenv
 import psutil
 import os
 import subprocess
 
 # Load environment variables
-load_dotenv(dotenv_path='/env/.env')
+load_dotenv(dotenv_path='env/.env')
+
+TOKEN = os.getenv('DISCORD_TOKEN')
+GUILD_ID = os.getenv('GUILD_ID')
+
+# Check if GUILD_ID is  loaded
+if GUILD_ID is None:
+    raise ValueError("GUILD_ID is not set in the .env file.")
+
+GUILD_ID = int(GUILD_ID)  # Convert after checking 
 
 intents = discord.Intents.default()
 
@@ -57,4 +65,4 @@ async def on_message(message):
         system_stats = get_system_stats()
         await message.channel.send(system_stats)
 
-bot.run(DISCORD_TOKEN)
+bot.run(TOKEN)
