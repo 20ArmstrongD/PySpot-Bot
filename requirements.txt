@@ -14,5 +14,6 @@ numpy==2.1.3
 propcache==0.2.0
 psutil==6.1.0
 pycord==0.1.1
+python-dotenv==1.0.1
 vcgencmd==0.1.1
 yarl==1.17.1
