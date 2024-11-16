@@ -33,9 +33,10 @@ def get_system_stats():
         temperature = temp_output.stdout.split('=')[1].split("'")[0]
     except Exception as e:
         temperature = "N/A"
+        print(e)
         
     system_stats = (
-        f"DiscordPI\n"
+        f"DiscordPI System Stats\n"
         f"**CPU Usage**: {cpu_usage}%\n"
         f"**Memory Usage**: {memory_usage}%\n"
         f"**Disk Usage**: {disk_usage}%\n"
